@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: ./database  # Make sure this directory has the Dockerfile and db.sql
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: Deviljin1
+      MYSQL_DATABASE: Login
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: Deviljin1
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      PORT: 4000
+      DB_NAME: Login
+      DB_USERNAME: appuser
+      DB_PASSWORD: Deviljin1
+      DB_HOST: db
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+
+volumes:
+  mysql-data:
